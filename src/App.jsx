@@ -6,16 +6,16 @@ function App() {
 
   const [tarea, setTarea] = React.useState('')
   const [tareas, setTareas] = React.useState([])
+  const [modoEdicion, setModoEdicion] = React.useState(false)
+  const [id, setId] = React.useState('')
 
 
   const agregarTarea = e => {
     e.preventDefault()
-
     if(!tarea.trim()){
       console.log('elemento vacio');
       return
     }
-    console.log(tarea);
 
     setTareas([
       ...tareas,
@@ -28,6 +28,29 @@ function App() {
   const eliminarTarea = id => {
     const arrayFiltrado = tareas.filter(item => item.id !== id)
     setTareas(arrayFiltrado)
+  }
+
+  const editar = item => {
+    setModoEdicion(true)
+    setTarea(item.nombreTarea)
+    setId(item.id)
+  }
+
+  const editarTarea = e => {
+    e.preventDefault()
+    if(!tarea.trim()){
+      console.log('elemento vacio');
+      return
+    }
+
+    const arrayeditado = tareas.map(
+      item => item.id === id ? {id, nombreTarea:tarea} : item
+    )
+
+    setTareas(arrayeditado)
+    setModoEdicion(false)
+    setTarea('')
+    setId('')
   }
 
   return (
@@ -51,6 +74,7 @@ function App() {
                   </button>
                   <button
                     className="btn btn-warning btn-sm float-right"
+                    onClick={() => editar(item)}
                   >
                     Editar
                   </button>
@@ -61,8 +85,12 @@ function App() {
           </ul>
         </div>
         <div className="col-4">
-          <h4 className="text-center">Formulario</h4>
-          <form onSubmit={ agregarTarea }>
+          <h4 className="text-center">
+            {
+              modoEdicion ? 'Editar Tarea' : 'Agregar Tarea'
+            }
+          </h4>
+          <form onSubmit={ modoEdicion ? editarTarea : agregarTarea }>
             <input
               type="text"
               className="form-control mb-2"
@@ -70,7 +98,13 @@ function App() {
               onChange={ e => setTarea(e.target.value) }
               value={tarea}
             />
-            <button className="btn btn-dark btn-block" type="submit">Agregar</button>
+            {
+              modoEdicion ? (
+                <button className="btn btn-success btn-block" type="submit">Guardar</button>
+              ) : (
+                <button className="btn btn-dark btn-block" type="submit">Agregar</button>
+              )
+            }
           </form>
         </div>
       </div>
